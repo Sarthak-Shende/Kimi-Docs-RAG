@@ -32,6 +32,10 @@ def is_section_header(line):
     return False
 
 for line in lines:
+
+    if line.strip().lower() == "references":
+        break
+
     if is_section_header(line):
         current_section = {
             "section_title": line,

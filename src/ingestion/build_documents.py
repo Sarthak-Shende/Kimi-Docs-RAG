@@ -31,11 +31,7 @@ def build_documents(section_objects):
             subsection_title = sub["subsection_title"]
             text = " ".join(sub["content"])
 
-            chunks = chunk_text_by_tokens(
-                text,
-                max_tokens=CHUNK_SIZE,
-                overlap_tokens=CHUNK_OVERLAP
-            )
+            chunks = chunk_text_by_tokens(text)
 
             chunk_type = classify_chunk_type(section_title, subsection_title)
 

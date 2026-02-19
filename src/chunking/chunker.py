@@ -1,23 +1,9 @@
-import os
-from dotenv import load_dotenv
-from google import genai
+from src.chunking.tokenizer import E5Tokenizer
+from src.config import CHUNK_SIZE, CHUNK_OVERLAP
 
-load_dotenv()
+tokenizer = E5Tokenizer()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-def count_tokens(text: str) -> int:
-  result = client.models.count_tokens(
-    model="gemini-3-flash-preview",
-    contents=text
-  )
-  return result.total_tokens
-
-def chunk_text_by_tokens(
-    text: str,
-    max_tokens: int = 1500,
-    overlap_tokens: int = 150
-):
+def chunk_text_by_tokens(text: str):
     words = text.split()
     chunks = []
 
@@ -26,16 +12,16 @@ def chunk_text_by_tokens(
 
     for word in words:
         current_chunk.append(word)
-        current_tokens = count_tokens(" ".join(current_chunk))
+        current_tokens = tokenizer.count_tokens(" ".join(current_chunk))
 
-        if current_tokens >= max_tokens:
+        if current_tokens >= CHUNK_SIZE:
             chunk_text = " ".join(current_chunk)
             chunks.append(chunk_text)
 
-            # overlap
-            overlap_words = current_chunk[-overlap_tokens:]
+            # overlap logic
+            overlap_words = current_chunk[-CHUNK_OVERLAP:]
             current_chunk = overlap_words
-            current_tokens = count_tokens(" ".join(current_chunk))
+            current_tokens = tokenizer.count_tokens(" ".join(current_chunk))
 
     if current_chunk:
         chunks.append(" ".join(current_chunk))
